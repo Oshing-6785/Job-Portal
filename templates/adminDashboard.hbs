@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin-dashboard/companies">Registered Companies</a></li>
+                <li><a href="/admin-dashboard/job-seekers">Registered Job Seekers</a></li>
+                <li><a href="/admin-dashboard/jobs">Manage Jobs</a></li>
+                <li><a href="/admin-dashboard/applications">View Applications</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Section for displaying content dynamically -->
+        <div id="content">
+       {{#if companies}}
+  <h2>Registered Companies</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Company Id</th>
+        <th>Company Name</th>
+        <th>Company Email</th>
+        <th>Company Documents</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each companies}}
+      <tr>
+        <td>{{this._id}}</td>
+        <td>{{this.name}}</td> 
+        <td>{{this.email}}</td> 
+        <td>
+          <ul>
+            {{#each this.documents}}
+              <li><a href="{{this}}" target="_blank">View Document</a></li>
+            {{/each}}
+          </ul>
+        </td>
+        <td>
+          <form action="/admin-dashboard/company/{{this._id}}/delete?_method=DELETE" method="POST">
+            <input type="hidden" name="_method" value="DELETE" />
+            <button type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{else}}
+  <p>No registered companies found.</p>
+{{/if}}
+
+
+
+
+{{#if jobSeekers}}
+  <h2>Registered Job Seekers</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Full Name</th>
+        <th>Email</th>
+        <th>Job ID </th>
+        <th>Resume</th>
+        <th>Cover Letter</th>
+        <th>Status</th>
+        <th>Applied Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each jobSeekers}}
+        {{#each applications}} <!-- Loop through applications for each job seeker -->
+          <tr>
+            <td>{{../name}}</td>
+            <td>{{../email}}</td>
+            <td>
+              {{#if this.job_id}}
+                {{#if this.job_id.title}}
+                  {{this.job_id.title}}
+                {{else}}
+                  {{this.job_id._id}} <!-- Display job_id if title is not present -->
+                {{/if}}
+              {{else}}
+                {{this.user_id}} <!-- Display user_id if job_id is not present -->
+              {{/if}}
+            </td>
+            <td><a href="/public/{{this.resume}}" target="_blank">View Resume</a></td>
+            <td>{{this.coverLetter}}</td>
+            <td>{{this.status}}</td>
+            <td>{{this.appliedDate}}</td>
+            <td>
+              <form action="/admin-dashboard/job-seeker/{{../_id}}/delete?_method=DELETE" method="POST">
+                <input type="hidden" name="_method" value="DELETE" />
+                <button type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {{/each}}
+      {{/each}}
+    </tbody>
+  </table>
+{{/if}}
+
+
+
+
+            {{#if jobs}}
+                <h2>Manage Jobs</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Job Title</th>
+                            <th>Company</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each jobs}}
+                        <tr>
+                            <td>{{this.title}}</td>
+                            <td>{{this.company_id.name}}</td>
+                            <td>
+                                {{!-- <a href="/job/{{this._id}}/edit">Edit</a> --}}
+                                <form action="/admin-dashboard/job/{{this._id}}/delete?_method=DELETE" method="POST">
+                                <input type="hidden" name="_method" value="DELETE" />
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            {{/if}}
+
+            <h1>Admin Dashboard</h1>
+
+<!-- Applications Table -->
+{{#if applications}}
+  <h2>Job Applications</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Applicant Name</th>
+        <th>Job Title</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each applications}}
+        <tr>
+          <td>{{this.user_id.name}}</td> <!-- Applicant Name -->
+          <td>{{#if this.job_id}}{{this.job_id.title}}{{else}}N/A{{/if}}</td> <!-- Job Title with fallback -->
+          <td>{{this.status}}</td> <!-- Status -->
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{/if}}
+
+
+        </div>
+    </div>
+</body>
+</html>
